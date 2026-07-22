@@ -604,6 +604,31 @@ def export_submissions():
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
+@app.route("/admin/delete/<int:admin_id>", methods=["POST"])
+def delete_admin(admin_id):
+
+    admin = current_admin()
+
+    if not admin:
+        return redirect("/login")
+
+    if admin.role != "Master":
+        flash("Only the Master can delete accounts.", "danger")
+        return redirect("/admin/management")
+
+    admin_to_delete = Admin.query.get_or_404(admin_id)
+
+    if admin_to_delete.id == admin.id:
+        flash("You cannot delete your own account.", "danger")
+        return redirect("/admin/management")
+
+    db.session.delete(admin_to_delete)
+    db.session.commit()
+
+    flash("Admin account deleted successfully.", "success")
+
+    return redirect("/admin/management")
+
 @app.route("/admin/activity-log")
 def activity_log():
 

@@ -7,11 +7,11 @@ Edit Decision
 {% block navbar %}
 
 <a class="nav-link text-white" href="/admin/review/{{ submission.id }}">
-    ⬅ Back
+    ⬅ <span class="nav-text">Back</span>
 </a>
 
 <a class="nav-link text-white" href="/logout">
-    🚪 Logout
+    🚪 <span class="nav-text">Logout</span>
 </a>
 
 {% endblock %}
@@ -73,14 +73,14 @@ Rejected
 </select>
 
 </div>
-
+<div class="text-center mt-4">
 <button
 class="btn btn-primary">
 
 Save Changes
 
 </button>
-
+</div>
 </form>
 
 </div>

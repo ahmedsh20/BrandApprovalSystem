@@ -1,6 +1,19 @@
 body {
+    cursor: default;
     background-color: #121212;
     color: white;
+}
+
+a,
+button,
+.btn {
+    cursor: pointer;
+}
+
+input,
+textarea,
+select {
+    cursor: text;
 }
 
 .card {
@@ -97,4 +110,11 @@ a[href^="tel:"]:hover{
 }
 html {
     overflow-y: scroll;
+}
+.nav-text {
+    text-decoration: none;
+}
+
+.nav-link:hover .nav-text {
+    text-decoration: underline;
 }

@@ -7,11 +7,11 @@ Admin Management
 {% block navbar %}
 
 <a class="nav-link text-white" href="/admin/dashboard">
-    ⬅ Dashboard
+    ⬅ <span class="nav-text">Dashboard</span>
 </a>
 
 <a class="nav-link text-white" href="/logout">
-    🚪 Logout
+    🚪 <span class="nav-text">Logout</span>
 </a>
 
 {% endblock %}
@@ -38,6 +38,7 @@ Admin Management
 <th>Role</th>
 <th class="text-center">Status</th>
 <th class="text-center">Manage</th>
+<th></th>
 
 </tr>
 
@@ -109,6 +110,24 @@ Disabled
 Not Editable
 
 </span>
+
+{% endif %}
+
+</td>
+
+<td class="text-center">
+
+{% if admin.role != "Master" %}
+
+<form method="POST"
+      action="{{ url_for('delete_admin', admin_id=admin.id) }}"
+      onsubmit="return confirm('Are you sure you want to permanently delete this admin account?');">
+
+    <button type="submit" class="btn btn-danger btn-sm">
+        Delete Account
+    </button>
+
+</form>
 
 {% endif %}
 

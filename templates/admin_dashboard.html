@@ -22,21 +22,21 @@ Dashboard
 {% if session.get("admin_role") == "Master" %}
 
 <a class="nav-link text-white" href="/admin/pending-registrations">
-    👥 Pending Registrations
+    👥 <span class="nav-text">Pending Registrations</span>
 </a>
 
 <a class="nav-link text-white" href="/admin/manage-admins">
-    🔑 Admin Management
+    🔑 <span class="nav-text">Admin Management</span>
 </a>
 
 {% endif %}
 
 <a class="nav-link text-white" href="/admin/activity-log">
-    📜 Activity Log
+    📜 <span class="nav-text">Activity Log</span>
 </a>
 
 <a class="nav-link text-white" href="/logout">
-    🚪 Logout
+    🚪 <span class="nav-text">Logout</span>
 </a>
 
 {% endblock %}

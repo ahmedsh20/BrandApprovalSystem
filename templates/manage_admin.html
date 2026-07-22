@@ -7,11 +7,11 @@ Manage Admin
 {% block navbar %}
 
 <a class="nav-link text-white" href="/admin/manage-admins">
-    ⬅ Back
+    ⬅ <span class="nav-text">Back</span>
 </a>
 
 <a class="nav-link text-white" href="/logout">
-    🚪 Logout
+    🚪 <span class="nav-text">Logout</span>
 </a>
 
 {% endblock %}
@@ -60,8 +60,7 @@ id="review"
 
 <label class="form-check-label" for="review">
 
-Can Review Requests
-
+Can Accept/Reject
 </label>
 
 </div>
@@ -100,12 +99,13 @@ Account Active
 
 </div>
 
-<button class="btn btn-success">
+<div class="text-center mt-4">
+    <button class="btn btn-success">
 
-💾 Save Changes
+        Save Changes
 
-</button>
-
+    </button>
+</div>
 </form>
 
 </div>
