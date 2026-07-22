@@ -7,6 +7,8 @@ from openpyxl import Workbook
 from zoneinfo import ZoneInfo
 from datetime import timedelta
 import os
+import webbrowser
+import threading
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "development-secret-key")
@@ -621,9 +623,14 @@ def activity_log():
         activities=activities
     )
 
+def open_browser():
+    webbrowser.open("http://127.0.0.1:5000")
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         print("Database and tables are ready!")
         print(app.url_map)
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        threading.Timer(1, open_browser).start()
     app.run(debug=True)
