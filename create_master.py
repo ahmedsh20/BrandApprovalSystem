@@ -1,10 +1,11 @@
 from app import app
 from models import db, Admin
+import getpass
 
 with app.app_context():
 
     username = input("Master username: ")
-    password = input("Master password: ")
+    password = getpass.getpass("Master password: ")
 
     existing = Admin.query.filter_by(role="Master").first()
 
