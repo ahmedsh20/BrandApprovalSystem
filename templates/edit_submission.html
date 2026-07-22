@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Decision
+{% endblock %}
+
+{% block navbar %}
+
+<a class="nav-link text-white" href="/admin/review/{{ submission.id }}">
+    ⬅ Back
+</a>
+
+<a class="nav-link text-white" href="/logout">
+    🚪 Logout
+</a>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h2>Edit Submission Status</h2>
+
+<p>
+
+Current status:
+
+            {% if submission.status == "Accepted" %}
+                <span class="text-success">Accepted</span>
+
+            {% elif submission.status == "Rejected" %}
+                <span class="text-danger">Rejected</span>
+
+            {% else %}
+                <span class="text-warning">Pending</span>
+
+            {% endif %}
+
+</p>
+
+<form method="POST">
+
+<div class="mb-4">
+
+<label class="form-label">
+
+Choose a new status
+
+</label>
+
+<select
+    class="form-select"
+    name="status">
+
+<option
+{% if submission.status=="Pending" %}selected{% endif %}>
+Pending
+</option>
+
+<option
+{% if submission.status=="Accepted" %}selected{% endif %}>
+Accepted
+</option>
+
+<option
+{% if submission.status=="Rejected" %}selected{% endif %}>
+Rejected
+</option>
+
+</select>
+
+</div>
+
+<button
+class="btn btn-primary">
+
+Save Changes
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}

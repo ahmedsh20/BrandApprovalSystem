@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+
+{% block navbar %}
+
+<span class="nav-link text-white">
+
+    Welcome
+
+    <strong>{{ session["admin_username"] }}</strong>
+    <span class="badge bg-warning text-dark ms-2">
+
+        {{ session["admin_role"] }}
+
+    </span>
+</span>
+
+<a class="nav-link text-white" href="/logout">
+    🚪 Logout
+</a>
+
+{% if session.get("admin_role") == "Master" %}
+
+<a class="nav-link text-white" href="/admin/pending-registrations">
+    👥 Pending Registrations
+</a>
+
+<a class="nav-link text-white" href="/admin/manage-admins">
+    🔑 Admin Management
+</a>
+
+
+{% endif %}
+
+<a class="nav-link text-white" href="/admin/activity-log">
+    📜 Activity Log
+</a>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2>
+        Admin Dashboard
+    </h2>
+
+    <div class="row mb-4">
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card text-center border-primary">
+
+                <div class="card-body">
+
+                    <h6 class="text-nowrap">Total</h6>
+
+                    <h4 class="fw-bold">{{ total_submissions }}</h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card text-center border-warning">
+
+                <div class="card-body">
+
+                    <h6 class="text-nowrap">Pending</h6>
+
+                    <h4 class="fw-bold text-warning">{{ pending_submissions }}</h4>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card text-center border-success">
+
+                <div class="card-body">
+
+                    <h6 class="text-nowrap">Accepted</h6>
+
+                    <h4 class="fw-bold text-success">{{ accepted_submissions }}</h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+
+            <div class="card text-center border-danger">
+
+                <div class="card-body">
+
+                    <h6 class="text-nowrap">Rejected</h6>
+
+                    <h4 class="fw-bold text-danger">{{ rejected_submissions }}</h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<form method="GET" class="mb-4">
+
+    <div class="input-group">
+
+        <input
+            type="text"
+            class="form-control"
+            name="search"
+            placeholder="Search Submissions"
+            value="{{ search }}"
+            autocomplete="off">
+
+        <select class="form-select" name="sort" style="max-width:220px;" onchange="this.form.submit()">
+
+            <option value="newest"
+                {% if sort == "newest" %}selected{% endif %}>
+                Newest First
+            </option>
+
+            <option value="pending"
+                {% if sort == "pending" %}selected{% endif %}>
+                Pending First
+            </option>
+
+            <option value="alphabetical"
+                {% if sort == "alphabetical" %}selected{% endif %}>
+                A-Z
+            </option>
+
+        </select>
+        <select class="form-select" name="status" style="max-width:180px;" onchange="this.form.submit()">
+
+            <option value=""
+                {% if status_filter == "" %}selected{% endif %}>
+                All Statuses
+            </option>
+
+            <option value="Pending"
+                {% if status_filter == "Pending" %}selected{% endif %}>
+                Pending
+            </option>
+
+            <option value="Accepted"
+                {% if status_filter == "Accepted" %}selected{% endif %}>
+                Accepted
+            </option>
+
+           <option value="Rejected"
+                {% if status_filter == "Rejected" %}selected{% endif %}>
+                Rejected
+            </option>
+
+        </select>
+        <a href="/admin/export" class="btn btn-success">
+
+            📊 Export to Excel
+
+        </a>
+        <button class="btn btn-primary">
+
+            🔍 Search
+
+        </button>
+
+        {% if search %}
+
+        <a
+        <a href="/admin/dashboard" class="btn btn-light text-dark fw-bold">
+            Reset
+        </a>
+
+        {% endif %}
+
+    </div>
+
+</form>
+
+{% if submissions %}
+
+<table class="table table-dark table-hover align-middle">
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+
+<th>Student</th>
+
+<th>Brand</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for submission in submissions %}
+
+<tr>
+
+<td>{{ submission.id }}</td>
+
+<td>{{ submission.student_name }}</td>
+
+<td>{{ submission.brand_name }}</td>
+
+<td>
+
+{% if submission.status == "Pending" %}
+
+<span class="badge bg-warning text-dark">
+
+Pending
+
+</span>
+
+{% elif submission.status == "Accepted" %}
+
+<span class="badge bg-success">
+
+Accepted
+
+</span>
+
+{% else %}
+
+<span class="badge bg-danger">
+
+Rejected
+
+</span>
+
+{% endif %}
+
+</td>
+
+<td>
+
+<a
+class="btn btn-primary btn-sm"
+href="/admin/review/{{ submission.id }}">
+
+Review
+
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% else %}
+
+<div class="alert alert-warning text-center">
+
+⚠️ No submissions were found.
+
+</div>
+
+{% endif %}
+
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}
+Activity Log
+{% endblock %}
+
+{% block navbar %}
+
+<a class="nav-link text-white" href="/admin/dashboard">
+    ⬅ Dashboard
+</a>
+
+<a class="nav-link text-white" href="/logout">
+    🚪 Logout
+</a>
+
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    Activity Log
+</h2>
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        <table class="table table-dark table-hover align-middle">
+
+            <thead>
+
+                <tr>
+
+                    <th>Time</th>
+                    <th>Admin</th>
+                    <th>Action</th>
+                    <th>Brand</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for activity in activities %}
+
+                <tr>
+
+                    <td>
+
+                        {{ activity.local_time.strftime("%d/%m/%Y %I:%M %p") }}
+
+                    </td>
+
+                    <td>
+
+                        {{ activity.admin_username }}
+
+                    </td>
+
+                    <td>
+
+                    {% if activity.action == "Accepted" %}
+
+                    <span class="badge bg-success">
+
+                        ✔ Accepted
+
+                    </span>
+
+                    {% elif activity.action == "Rejected" %}
+
+                    <span class="badge bg-danger">
+
+                        ✖ Rejected
+
+                    </span>
+
+                    {% elif activity.action == "Edited" %}
+
+                    <span class="badge bg-primary">
+
+                        ✏ Edited
+
+                    </span>
+
+                    {% endif %}
+
+                    </td>
+                    <td>
+
+                        {{ activity.target }}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

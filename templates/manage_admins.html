@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}
+Admin Management
+{% endblock %}
+
+{% block navbar %}
+
+<a class="nav-link text-white" href="/admin/dashboard">
+    ⬅ Dashboard
+</a>
+
+<a class="nav-link text-white" href="/logout">
+    🚪 Logout
+</a>
+
+{% endblock %}
+
+{% block content %}
+
+<h2 class="text-center mb-4">
+
+Admin Management
+
+</h2>
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<table class="table table-dark table-hover align-middle">
+
+<thead>
+
+<tr>
+
+<th>Username</th>
+<th>Role</th>
+<th class="text-center">Status</th>
+<th class="text-center">Manage</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for admin in admins %}
+
+<tr>
+
+<td>
+
+{{ admin.username }}
+
+{% if admin.role == "Master" %}
+
+<span class="badge bg-warning text-dark ms-2">
+Master
+</span>
+
+{% endif %}
+
+</td>
+
+<td>
+
+{{ admin.role }}
+
+</td>
+
+<td class="text-center">
+
+{% if admin.active %}
+
+<span class="badge bg-success">
+
+Active
+
+</span>
+
+{% else %}
+
+<span class="badge bg-danger">
+
+Disabled
+
+</span>
+
+{% endif %}
+
+</td>
+
+<td class="text-center">
+
+{% if admin.role != "Master" %}
+
+<a href="/admin/manage-admin/{{ admin.id }}"
+   class="btn btn-primary">
+
+    Manage
+
+</a>
+
+{% else %}
+
+<span class="text-secondary">
+
+Not Editable
+
+</span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+{% endblock %}

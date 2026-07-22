@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}
+Review Submission
+{% endblock %}
+
+{% block navbar %}
+
+<a class="nav-link text-white" href="/admin/dashboard">
+    ⬅ Back
+</a>
+
+<a class="nav-link text-white" href="/logout">
+    🚪 Logout
+</a>
+
+{% endblock %}
+
+{% block content %}
+
+<head>
+
+    <title>Review Submission</title>
+
+</head>
+
+<body>
+
+<div class="container mt-5" style="max-width:800px;">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<div class="d-flex align-items-center mb-4">
+
+    <h2 class="mb-0 me-3">
+        Review Submission
+    </h2>
+
+    {% if submission.status == "Pending" %}
+
+        <span class="badge bg-warning text-dark fs-6">
+            Pending
+        </span>
+
+    {% elif submission.status == "Accepted" %}
+
+        <span class="badge bg-success fs-6">
+            Accepted
+        </span>
+
+    {% elif submission.status == "Rejected" %}
+
+        <span class="badge bg-danger fs-6">
+            Rejected
+        </span>
+
+    {% endif %}
+
+</div>
+
+<table class="table table-dark">
+
+<tr>
+
+<th>Student Name</th>
+
+<td>{{ submission.student_name }}</td>
+
+</tr>
+
+<tr>
+
+<th>BUE ID</th>
+
+<td>{{ submission.bue_id }}</td>
+
+</tr>
+
+<tr>
+
+<th>Brand</th>
+
+<td>{{ submission.brand_name }}</td>
+
+</tr>
+
+<tr>
+
+<th>Social Media</th>
+
+<td>
+
+<a href="{{ submission.social_link }}" target="_blank">
+
+{{ submission.social_link }}
+
+</a>
+
+</td>
+
+</tr>
+
+<tr>
+
+<th>Category</th>
+
+<td>{{ submission.category }}</td>
+
+</tr>
+
+<tr>
+
+<th>Phone</th>
+
+<td>{{ submission.phone_number }}</td>
+
+</tr>
+
+<tr>
+
+<th>Contact Name</th>
+
+<td>{{ submission.contact_name }}</td>
+
+</tr>
+
+<tr>
+
+<th>Position</th>
+
+<td>{{ submission.contact_position }}</td>
+
+</tr>
+
+</table>
+
+{% if submission.status == "Pending" %}
+
+    {% if session.get("can_review") or session.get("admin_role") == "Master" %}
+
+    <div class="d-flex justify-content-center gap-3 mt-4">
+
+        <form action="/admin/accept/{{ submission.id }}" method="POST">
+
+            <button class="btn btn-success btn-lg">
+                ✔ Accept
+            </button>
+
+        </form>
+
+
+        <form action="/admin/reject/{{ submission.id }}" method="POST">
+
+            <button class="btn btn-danger btn-lg">
+                ✖ Reject
+            </button>
+
+        </form>
+
+    </div>
+
+    {% endif %}
+
+
+{% else %}
+
+    <div class="alert alert-info text-center mt-4">
+
+        This submission has already been
+
+        {% if submission.status == "Accepted" %}
+
+        <b class="text-success">
+            Accepted
+        </b>
+
+        {% elif submission.status == "Rejected" %}
+
+        <b class="text-danger">
+            Rejected
+        </b>
+
+        {% endif %}
+
+    </div>
+
+
+    {% if session.get("can_edit") or session.get("admin_role") == "Master" %}
+
+    <div class="text-center mt-3">
+
+        <a href="/admin/edit/{{ submission.id }}" 
+           class="btn btn-primary btn-lg">
+
+            ✏ Edit Submission
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
+
+{% endif %}
+
+</body>
+
+{% endblock %}

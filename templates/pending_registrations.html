@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}
+Pending Registrations
+{% endblock %}
+
+{% block navbar %}
+
+<a class="nav-link text-white" href="/admin/dashboard">
+    ⬅ Dashboard
+</a>
+
+
+<a class="nav-link text-white" href="/logout">
+    🚪 Logout
+</a>
+
+{% endblock %}
+
+{% block content %}
+
+<h2 class="text-center mb-4">
+    Pending Registration Requests
+</h2>
+
+{% if requests %}
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        <table class="table table-dark table-hover align-middle">
+
+            <thead>
+
+                <tr>
+
+                    <th>Username</th>
+
+                    <th class="text-center">Actions</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for request in requests %}
+
+                <tr>
+
+                    <td>{{ request.username }}</td>
+
+                    <td class="text-center">
+
+                        <form
+                            action="{{ url_for('approve_registration', id=request.id) }}"
+                            method="POST"
+                            style="display:inline;">
+
+                            <button
+                                type="submit"
+                                class="btn btn-success">
+
+                                Approve
+
+                            </button>
+
+                        </form>
+
+                        <form
+                            action="{{ url_for('reject_registration', id=request.id) }}"
+                            method="POST"
+                            style="display:inline; margin-left:10px;">
+
+                            <button
+                                type="submit"
+                                class="btn btn-danger">
+
+                                Reject
+
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% else %}
+
+<div class="alert alert-success text-center">
+
+    No pending registration requests.
+
+</div>
+
+{% endif %}
+
+{% endblock %}

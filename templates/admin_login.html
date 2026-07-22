@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}
+Admin Login
+{% endblock %}
+
+{% block navbar %}
+
+<a class="nav-link text-white" href="/">
+    🏠 Home
+</a>
+<a class="nav-link text-white" href="/register">
+    📝 Register
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+<div class="col-md-5">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h2 class="text-center mb-4">
+
+Admin Login
+
+</h2>
+
+{% if error %}
+
+<div class="alert alert-danger">
+
+{{ error }}
+
+</div>
+
+{% endif %}
+
+{% if pending %}
+
+<div class="alert alert-warning text-center">
+
+⏳ Your registration request is currently waiting for approval by the Master Admin.
+
+</div>
+
+{% endif %}
+
+<form method="POST">
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Username
+
+</label>
+
+<input
+    class="form-control"
+    type="text"
+    name="username">
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Password
+
+</label>
+
+<input
+    class="form-control"
+    type="password"
+    name="password">
+
+</div>
+
+<button
+    class="btn btn-primary w-100">
+
+Login
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

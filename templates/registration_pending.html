@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}
+Registration Submitted
+{% endblock %}
+
+{% block navbar %}
+
+<a class="nav-link text-white" href="/">
+    🏠 Home
+</a>
+
+<a class="nav-link text-white" href="/admin">
+    🔐 Admin Login
+</a>
+
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-7">
+
+        <div class="card shadow-lg border-info">
+
+            <div class="card-body text-center p-5">
+
+                <h1 class="display-6 mb-4">
+                    ✅ Registration Submitted
+                </h1>
+
+                <p class="text-white fs-5">
+
+                    Your admin registration request has been submitted successfully.
+
+                </p>
+
+                <p class="text-white">
+
+                    Your account is currently waiting for approval from the
+                    <strong>Master Admin</strong>.
+
+                    <br><br>
+
+                    You will be able to log in after your registration has been approved.
+
+                </p>
+
+                <div class="mt-4">
+
+                    <a
+                        href="/"
+                        class="btn btn-primary btn-lg">
+
+                        Return to Home
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

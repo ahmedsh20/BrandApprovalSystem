@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}
+Register Admin
+{% endblock %}
+{% block navbar %}
+
+<a class="nav-link text-white" href="/">
+    🏠 Home
+</a>
+
+<a class="nav-link text-white" href="/admin">
+    🔐 Admin Login
+</a>
+
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+<div class="col-md-5">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h2 class="text-center mb-4">
+
+Register Admin
+
+</h2>
+
+{% if error %}
+
+<div class="alert alert-danger text-center">
+
+    {{ error }}
+
+</div>
+
+{% endif %}
+
+
+<form method="POST">
+
+<div class="mb-3">
+
+<label>Username</label>
+
+<input
+type="text"
+name="username"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>Password</label>
+
+<input
+type="password"
+name="password"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-4">
+
+<label>Confirm Password</label>
+
+<input
+type="password"
+name="confirm_password"
+class="form-control"
+required>
+
+</div>
+
+<button
+class="btn btn-success w-100">
+
+Request Registration
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

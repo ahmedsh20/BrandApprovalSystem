@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}
+Submission Successful
+{% endblock %}
+
+{% block navbar %}
+
+<a class="nav-link text-white" href="/">
+    🏠 Home
+</a>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow text-center">
+
+    <div class="card-body p-5">
+
+        <h1 class="text-success">
+
+            ✔ Submission Successful
+
+        </h1>
+
+        <p class="mt-3">
+
+            Your request has been submitted successfully.
+
+            It will now be reviewed by an administrator.
+
+        </p>
+
+        <div class="d-grid gap-3 mt-5">
+
+            <a
+                href="/"
+                class="btn btn-primary btn-lg">
+
+                Submit Another Request
+
+            </a>
+
+            <a
+                href="/check-status"
+                class="btn btn-outline-light btn-lg">
+
+                Check My Requests
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
