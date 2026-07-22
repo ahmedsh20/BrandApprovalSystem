@@ -94,17 +94,26 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-window.addEventListener("load", function () {
-    const scrollPos = sessionStorage.getItem("scrollPos");
-    if (scrollPos !== null) {
-        window.scrollTo(0, parseInt(scrollPos));
-        sessionStorage.removeItem("scrollPos");
+    function saveScrollPosition() {
+        sessionStorage.setItem("scrollPos", window.scrollY);
     }
-});
 
-window.addEventListener("beforeunload", function () {
-    sessionStorage.setItem("scrollPos", window.scrollY);
-});
+    // Save continuously while scrolling
+    window.addEventListener("scroll", saveScrollPosition);
+
+    // Save when the page is hidden (works better on mobile)
+    window.addEventListener("pagehide", saveScrollPosition);
+
+    // Restore after the page has loaded
+    window.addEventListener("load", function () {
+        const scrollPos = sessionStorage.getItem("scrollPos");
+
+        if (scrollPos !== null) {
+            setTimeout(function () {
+                window.scrollTo(0, parseInt(scrollPos));
+            }, 50);
+        }
+    });
 </script>
 
 </body>
