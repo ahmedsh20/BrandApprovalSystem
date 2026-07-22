@@ -18,225 +18,324 @@ Review Submission
 
 {% block content %}
 
-<head>
+<div class="container" style="max-width:900px;">
 
-    <title>Review Submission</title>
+    <div class="card shadow">
 
-</head>
+        <div class="card-body">
 
-<body>
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
 
-<div class="container mt-5" style="max-width:800px;">
+                <h2 class="mb-3 mb-md-0">
 
-<div class="card shadow">
+                    Review Submission
 
-<div class="card-body">
+                </h2>
 
-<div class="d-flex align-items-center mb-4">
+                {% if submission.status == "Pending" %}
 
-    <h2 class="mb-0 me-3">
-        Review Submission
-    </h2>
+                    <span class="badge bg-warning text-dark fs-6 align-self-start align-self-md-center">
 
-    {% if submission.status == "Pending" %}
+                        Pending
 
-        <span class="badge bg-warning text-dark fs-6">
-            Pending
-        </span>
+                    </span>
 
-    {% elif submission.status == "Accepted" %}
+                {% elif submission.status == "Accepted" %}
 
-        <span class="badge bg-success fs-6">
-            Accepted
-        </span>
+                    <span class="badge bg-success fs-6 align-self-start align-self-md-center">
 
-    {% elif submission.status == "Rejected" %}
+                        Accepted
 
-        <span class="badge bg-danger fs-6">
-            Rejected
-        </span>
+                    </span>
 
-    {% endif %}
+                {% elif submission.status == "Rejected" %}
 
-</div>
+                    <span class="badge bg-danger fs-6 align-self-start align-self-md-center">
 
-<table class="table table-dark">
+                        Rejected
 
-<tr>
+                    </span>
 
-<th>Student Name</th>
+                {% endif %}
 
-<td>{{ submission.student_name }}</td>
+            </div>
 
-</tr>
+            <div class="table-responsive">
 
-<tr>
+                <table class="table table-dark align-middle">
 
-<th>BUE ID</th>
+                    <tr>
 
-<td>{{ submission.bue_id }}</td>
+                        <th style="width:35%;">
 
-</tr>
+                            Student Name
 
-<tr>
+                        </th>
 
-<th>Brand</th>
+                        <td>
 
-<td>{{ submission.brand_name }}</td>
+                            {{ submission.student_name }}
 
-</tr>
+                        </td>
 
-<tr>
+                    </tr>
 
-<th>Social Media</th>
+                    <tr>
 
-<td>
+                        <th>
 
-<a href="{{ submission.social_link }}" target="_blank">
+                            BUE ID
 
-{{ submission.social_link }}
+                        </th>
 
-</a>
+                        <td>
 
-</td>
+                            {{ submission.bue_id }}
 
-</tr>
+                        </td>
 
-<tr>
+                    </tr>
 
-<th>Category</th>
+                    <tr>
 
-<td>{{ submission.category }}</td>
+                        <th>
 
-</tr>
+                            Brand
 
-<tr>
+                        </th>
 
-<th>Phone</th>
+                        <td>
 
-<td>{{ submission.phone_number }}</td>
+                            {{ submission.brand_name }}
 
-</tr>
+                        </td>
 
-<tr>
+                    </tr>
 
-<th>Contact Name</th>
+                    <tr>
 
-<td>{{ submission.contact_name }}</td>
+                        <th>
 
-</tr>
+                            Social Media
 
-<tr>
+                        </th>
 
-<th>Position</th>
+                        <td>
 
-<td>{{ submission.contact_position }}</td>
+                            <a href="{{ submission.social_link }}"
+                               target="_blank"
+                               class="text-info">
 
-</tr>
+                                {{ submission.social_link }}
 
-</table>
+                            </a>
 
-{% if submission.status == "Pending" %}
+                        </td>
 
-    {% if session.get("can_review") or session.get("admin_role") == "Master" %}
+                    </tr>
 
-    <div class="d-flex justify-content-center gap-3 mt-4">
+                    <tr>
 
-        <form action="/admin/accept/{{ submission.id }}" method="POST">
+                        <th>
 
-            <button class="btn btn-success btn-lg">
-                Accept
-            </button>
+                            Category
 
-        </form>
+                        </th>
 
+                        <td>
 
-        <form action="/admin/reject/{{ submission.id }}" method="POST">
+                            {{ submission.category }}
 
-            <button class="btn btn-danger btn-lg">
-                Reject
-            </button>
+                        </td>
 
-        </form>
+                    </tr>
 
-    </div>
+                    <tr>
 
-    {% if session.get("admin_role") == "Master" %}
+                        <th>
 
-        <div class="text-center mt-3">
+                            Phone
 
-            <form action="/admin/delete-submission/{{ submission.id }}"
-                  method="POST"
-                  onsubmit="return confirm('Are you sure you want to permanently delete this request? This action cannot be undone.');">
+                        </th>
 
-               <button type="submit" class="btn btn-outline-danger btn-lg">
-                    Delete Request
-                </button>
+                        <td>
 
-            </form>
+                            {{ submission.phone_number }}
 
+                        </td>
+
+                    </tr>
+                    <tr>
+
+                        <th>
+
+                            Contact Name
+
+                        </th>
+
+                        <td>
+
+                            {{ submission.contact_name }}
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>
+
+                            Position
+
+                        </th>
+
+                        <td>
+
+                            {{ submission.contact_position }}
+
+                        </td>
+
+                    </tr>
+
+                </table>
+
+            </div>
+
+            {% if submission.status == "Pending" %}
+
+                {% if session.get("can_review") or session.get("admin_role") == "Master" %}
+
+                <div class="row g-3 justify-content-center mt-4">
+
+                    <div class="col-12 col-md-auto">
+
+                        <form action="/admin/accept/{{ submission.id }}" method="POST">
+
+                            <button class="btn btn-success btn-lg w-100">
+
+                                Accept
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                    <div class="col-12 col-md-auto">
+
+                        <form action="/admin/reject/{{ submission.id }}" method="POST">
+
+                            <button class="btn btn-danger btn-lg w-100">
+
+                                Reject
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                {% if session.get("admin_role") == "Master" %}
+
+                <div class="row mt-3">
+
+                    <div class="col-12 text-center">
+
+                        <form
+                            action="/admin/delete-submission/{{ submission.id }}"
+                            method="POST"
+                            onsubmit="return confirm('Are you sure you want to permanently delete this request? This action cannot be undone.');">
+
+                            <button
+                                type="submit"
+                                class="btn btn-outline-danger btn-lg w-100 w-md-auto">
+
+                                Delete Request
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+                {% endif %}
+
+            {% else %}
+
+                <div class="alert alert-info text-center mt-4">
+
+                    This submission has already been
+
+                    {% if submission.status == "Accepted" %}
+
+                        <strong class="text-success">
+
+                            Accepted
+
+                        </strong>
+
+                    {% elif submission.status == "Rejected" %}
+
+                        <strong class="text-danger">
+
+                            Rejected
+
+                        </strong>
+
+                    {% endif %}
+
+                </div>
+
+                {% if session.get("can_edit") or session.get("admin_role") == "Master" %}
+
+                <div class="row g-3 justify-content-center mt-3">
+
+                    <div class="col-12 col-md-auto">
+
+                        <a
+                            href="/admin/edit/{{ submission.id }}"
+                            class="btn btn-primary btn-lg w-100">
+
+                            Edit Submission
+
+                        </a>
+
+                    </div>
+
+                    <div class="col-12 col-md-auto">
+
+                        <form
+                            action="/admin/delete-submission/{{ submission.id }}"
+                            method="POST"
+                            onsubmit="return confirm('Are you sure you want to permanently delete this request? This action cannot be undone.');">
+
+                            <button
+                                type="submit"
+                                class="btn btn-outline-danger btn-lg w-100">
+
+                                Delete Request
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+            {% endif %}
         </div>
 
-        {% endif %}
-    
-    {% endif %}
-
-
-{% else %}
-
-    <div class="alert alert-info text-center mt-4">
-
-        This submission has already been
-
-        {% if submission.status == "Accepted" %}
-
-        <b class="text-success">
-            Accepted
-        </b>
-
-        {% elif submission.status == "Rejected" %}
-
-        <b class="text-danger">
-            Rejected
-        </b>
-
-        {% endif %}
-
     </div>
 
-
-    {% if session.get("can_edit") or session.get("admin_role") == "Master" %}
-
-    <div class="text-center mt-3">
-
-        <a href="/admin/edit/{{ submission.id }}" 
-           class="btn btn-primary btn-lg">
-
-            Edit Submission
-
-        </a>
-
-    </div>
-
-    <div class="text-center mt-3">
-
-        <form action="/admin/delete-submission/{{ submission.id }}"
-              method="POST"
-              onsubmit="return confirm('Are you sure you want to permanently delete this request? This action cannot be undone.');">
-
-           <button type="submit" class="btn btn-outline-danger btn-lg">
-                Delete Request
-            </button>
-
-        </form>
-
-    </div>
-
-    {% endif %}
-
-
-{% endif %}
-
-</body>
+</div>
 
 {% endblock %}

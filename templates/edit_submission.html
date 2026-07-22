@@ -18,72 +18,97 @@ Edit Decision
 
 {% block content %}
 
-<div class="card shadow">
+<div class="row justify-content-center">
 
-<div class="card-body">
+    <div class="col-12 col-lg-8">
 
-<h2>Edit Submission Status</h2>
+        <div class="card shadow">
 
-<p>
+            <div class="card-body p-4 p-md-5">
 
-Current status:
+                <h2 class="mb-4 text-center">
 
-            {% if submission.status == "Accepted" %}
-                <span class="text-success">Accepted</span>
+                    Edit Submission Status
 
-            {% elif submission.status == "Rejected" %}
-                <span class="text-danger">Rejected</span>
+                </h2>
 
-            {% else %}
-                <span class="text-warning">Pending</span>
+                <p class="text-center">
 
-            {% endif %}
+                    Current status:
 
-</p>
+                    {% if submission.status == "Accepted" %}
 
-<form method="POST">
+                        <span class="text-success fw-bold">
+                            Accepted
+                        </span>
 
-<div class="mb-4">
+                    {% elif submission.status == "Rejected" %}
 
-<label class="form-label">
+                        <span class="text-danger fw-bold">
+                            Rejected
+                        </span>
 
-Choose a new status
+                    {% else %}
 
-</label>
+                        <span class="text-warning fw-bold">
+                            Pending
+                        </span>
 
-<select
-    class="form-select"
-    name="status">
+                    {% endif %}
 
-<option
-{% if submission.status=="Pending" %}selected{% endif %}>
-Pending
-</option>
+                </p>
 
-<option
-{% if submission.status=="Accepted" %}selected{% endif %}>
-Accepted
-</option>
+                <form method="POST">
 
-<option
-{% if submission.status=="Rejected" %}selected{% endif %}>
-Rejected
-</option>
+                    <div class="mb-4">
 
-</select>
+                        <label class="form-label">
 
-</div>
-<div class="text-center mt-4">
-<button
-class="btn btn-primary">
+                            Choose a new status
 
-Save Changes
+                        </label>
 
-</button>
-</div>
-</form>
+                        <select
+                            class="form-select"
+                            name="status">
 
-</div>
+                            <option
+                                {% if submission.status=="Pending" %}selected{% endif %}>
+                                Pending
+                            </option>
+
+                            <option
+                                {% if submission.status=="Accepted" %}selected{% endif %}>
+                                Accepted
+                            </option>
+
+                            <option
+                                {% if submission.status=="Rejected" %}selected{% endif %}>
+                                Rejected
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="d-grid">
+
+                        <button
+                            class="btn btn-primary btn-lg">
+
+                            Save Changes
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 

@@ -10,7 +10,6 @@ Pending Registrations
     ⬅ <span class="nav-text">Dashboard</span>
 </a>
 
-
 <a class="nav-link text-white" href="/logout">
     🚪 <span class="nav-text">Logout</span>
 </a>
@@ -29,69 +28,81 @@ Pending Registrations
 
     <div class="card-body">
 
-        <table class="table table-dark table-hover align-middle">
+        <div class="table-responsive">
 
-            <thead>
+            <table class="table table-dark table-hover align-middle mb-0">
 
-                <tr>
+                <thead>
 
-                    <th>Username</th>
+                    <tr>
 
-                    <th class="text-center">Actions</th>
+                        <th>Username</th>
 
-                </tr>
+                        <th class="text-center">
+                            Actions
+                        </th>
 
-            </thead>
+                    </tr>
 
-            <tbody>
+                </thead>
 
-            {% for request in requests %}
+                <tbody>
 
-                <tr>
+                    {% for request in requests %}
 
-                    <td>{{ request.username }}</td>
+                    <tr>
 
-                    <td class="text-center">
+                        <td class="align-middle">
 
-                        <form
-                            action="{{ url_for('approve_registration', id=request.id) }}"
-                            method="POST"
-                            style="display:inline;">
+                            {{ request.username }}
 
-                            <button
-                                type="submit"
-                                class="btn btn-success">
+                        </td>
 
-                                Approve
+                        <td>
 
-                            </button>
+                            <div class="d-grid gap-2 d-md-flex justify-content-center">
 
-                        </form>
+                                <form
+                                    action="{{ url_for('approve_registration', id=request.id) }}"
+                                    method="POST">
 
-                        <form
-                            action="{{ url_for('reject_registration', id=request.id) }}"
-                            method="POST"
-                            style="display:inline; margin-left:10px;">
+                                    <button
+                                        type="submit"
+                                        class="btn btn-success w-100">
 
-                            <button
-                                type="submit"
-                                class="btn btn-danger">
+                                        Approve
 
-                                Reject
+                                    </button>
 
-                            </button>
+                                </form>
 
-                        </form>
+                                <form
+                                    action="{{ url_for('reject_registration', id=request.id) }}"
+                                    method="POST">
 
-                    </td>
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger w-100">
 
-                </tr>
+                                        Reject
 
-            {% endfor %}
+                                    </button>
 
-            </tbody>
+                                </form>
 
-        </table>
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 

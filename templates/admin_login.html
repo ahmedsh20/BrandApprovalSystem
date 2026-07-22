@@ -9,93 +9,99 @@ Admin Login
 <a class="nav-link text-white" href="/">
     🏠 <span class="nav-text">Home</span>
 </a>
+
 <a class="nav-link text-white" href="/register">
     📝 <span class="nav-text">Register</span>
 </a>
+
 {% endblock %}
 
 {% block content %}
 
 <div class="row justify-content-center">
 
-<div class="col-md-5">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-5">
 
-<div class="card shadow">
+        <div class="card shadow">
 
-<div class="card-body">
+            <div class="card-body p-4 p-md-5">
 
-<h2 class="text-center mb-4">
+                <h2 class="text-center mb-4">
 
-Admin Login
+                    Admin Login
 
-</h2>
+                </h2>
 
-{% if error %}
+                {% if error %}
 
-<div class="alert alert-danger">
+                <div class="alert alert-danger text-center">
 
-{{ error }}
+                    {{ error }}
 
-</div>
+                </div>
 
-{% endif %}
+                {% endif %}
 
-{% if pending %}
+                {% if pending %}
 
-<div class="alert alert-warning text-center">
+                <div class="alert alert-warning text-center">
 
-⏳ Your registration request is currently waiting for approval by the Master Admin.
+                    ⏳ Your registration request is currently waiting for approval by the Master Admin.
 
-</div>
+                </div>
 
-{% endif %}
+                {% endif %}
 
-<form method="POST">
+                <form method="POST">
 
-<div class="mb-3">
+                    <div class="mb-3">
 
-<label class="form-label">
+                        <label class="form-label">
 
-Username
+                            Username
 
-</label>
+                        </label>
 
-<input
-    class="form-control"
-    type="text"
-    name="username">
+                        <input
+                            class="form-control"
+                            type="text"
+                            name="username"
+                            autocomplete="username"
+                            required>
 
-</div>
+                    </div>
 
-<div class="mb-3">
+                    <div class="mb-4">
 
-<label class="form-label">
+                        <label class="form-label">
 
-Password
+                            Password
 
-</label>
+                        </label>
 
-<input
-    class="form-control"
-    type="password"
-    name="password">
+                        <input
+                            class="form-control"
+                            type="password"
+                            name="password"
+                            autocomplete="current-password"
+                            required>
 
-</div>
+                    </div>
 
-<button
-    class="btn btn-primary w-100">
+                    <button
+                        class="btn btn-primary w-100">
 
-Login
+                        Login
 
-</button>
+                    </button>
 
-</form>
+                </form>
 
-</div>
+            </div>
 
-</div>
+        </div>
 
-</div>
+    </div>
 
 </div>
 

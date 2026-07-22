@@ -118,3 +118,86 @@ html {
 .nav-link:hover .nav-text {
     text-decoration: underline;
 }
+/* ===========================
+   MOBILE RESPONSIVE FIXES
+   =========================== */
+
+@media (max-width: 992px){
+
+    .navbar-brand{
+        font-size:1rem;
+    }
+
+    .navbar-nav{
+        margin-top:10px;
+        text-align:center;
+    }
+
+    .nav-link{
+        padding:.6rem 0;
+    }
+
+    h1{
+        font-size:2rem;
+    }
+
+    h2{
+        font-size:1.6rem;
+    }
+
+    h3{
+        font-size:1.4rem;
+    }
+
+    .container{
+        padding-left:15px;
+        padding-right:15px;
+    }
+
+    .card{
+        border-radius:12px;
+    }
+
+    .btn{
+        width:100%;
+        margin-bottom:10px;
+    }
+
+    .input-group{
+        flex-direction:column;
+    }
+
+    .input-group>.form-control,
+    .input-group>.form-select,
+    .input-group>.btn{
+        width:100%;
+        max-width:100% !important;
+        margin-bottom:10px;
+    }
+
+    table{
+        font-size:.9rem;
+    }
+
+    .table-responsive{
+        overflow-x:auto;
+    }
+
+}
+
+@media (max-width:768px){
+
+    img.rounded-circle{
+        width:120px !important;
+        height:120px !important;
+    }
+
+    .display-6{
+        font-size:1.8rem;
+    }
+
+    footer{
+        font-size:.9rem;
+    }
+
+}

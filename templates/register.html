@@ -3,6 +3,7 @@
 {% block title %}
 Register Admin
 {% endblock %}
+
 {% block navbar %}
 
 <a class="nav-link text-white" href="/">
@@ -13,88 +14,101 @@ Register Admin
     🔐 <span class="nav-text">Admin Login</span>
 </a>
 
-
 {% endblock %}
 
 {% block content %}
 
 <div class="row justify-content-center">
 
-<div class="col-md-5">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-5">
 
-<div class="card shadow">
+        <div class="card shadow">
 
-<div class="card-body">
+            <div class="card-body p-4 p-md-5">
 
-<h2 class="text-center mb-4">
+                <h2 class="text-center mb-4">
 
-Register Admin
+                    Register Admin
 
-</h2>
+                </h2>
 
-{% if error %}
+                {% if error %}
 
-<div class="alert alert-danger text-center">
+                <div class="alert alert-danger text-center">
 
-    {{ error }}
+                    {{ error }}
 
-</div>
+                </div>
 
-{% endif %}
+                {% endif %}
 
+                <form method="POST">
 
-<form method="POST">
+                    <div class="mb-3">
 
-<div class="mb-3">
+                        <label class="form-label">
 
-<label>Username</label>
+                            Username
 
-<input
-type="text"
-name="username"
-class="form-control"
-required>
+                        </label>
 
-</div>
+                        <input
+                            type="text"
+                            name="username"
+                            class="form-control"
+                            autocomplete="username"
+                            required>
 
-<div class="mb-3">
+                    </div>
 
-<label>Password</label>
+                    <div class="mb-3">
 
-<input
-type="password"
-name="password"
-class="form-control"
-required>
+                        <label class="form-label">
 
-</div>
+                            Password
 
-<div class="mb-4">
+                        </label>
 
-<label>Confirm Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            class="form-control"
+                            autocomplete="new-password"
+                            required>
 
-<input
-type="password"
-name="confirm_password"
-class="form-control"
-required>
+                    </div>
 
-</div>
+                    <div class="mb-4">
 
-<button
-class="btn btn-success w-100">
+                        <label class="form-label">
 
-Request Registration
+                            Confirm Password
 
-</button>
+                        </label>
 
-</form>
+                        <input
+                            type="password"
+                            name="confirm_password"
+                            class="form-control"
+                            autocomplete="new-password"
+                            required>
 
-</div>
+                    </div>
 
-</div>
+                    <button
+                        class="btn btn-success w-100">
 
-</div>
+                        Request Registration
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 

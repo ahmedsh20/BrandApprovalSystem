@@ -20,140 +20,163 @@ Admin Management
 
 <h2 class="text-center mb-4">
 
-Admin Management
+    Admin Management
 
 </h2>
 
 <div class="card shadow">
 
-<div class="card-body">
+    <div class="card-body">
 
-<table class="table table-dark table-hover align-middle">
+        <div class="table-responsive">
 
-<thead>
+            <table class="table table-dark table-hover align-middle">
 
-<tr>
+                <thead>
 
-<th>Username</th>
-<th>Role</th>
-<th class="text-center">Status</th>
-<th class="text-center">Manage</th>
-<th></th>
+                    <tr>
 
-</tr>
+                        <th>Username</th>
 
-</thead>
+                        <th>Role</th>
 
-<tbody>
+                        <th class="text-center">Status</th>
 
-{% for admin in admins %}
+                        <th class="text-center">Manage</th>
 
-<tr>
+                        <th class="text-center">Delete</th>
 
-<td>
+                    </tr>
 
-{{ admin.username }}
+                </thead>
 
-{% if admin.role == "Master" %}
+                <tbody>
 
-<span class="badge bg-warning text-dark ms-2">
-Master
-</span>
+                    {% for admin in admins %}
 
-{% endif %}
+                    <tr>
 
-</td>
+                        <td>
 
-<td>
+                            {{ admin.username }}
 
-{{ admin.role }}
+                            {% if admin.role == "Master" %}
 
-</td>
+                            <span class="badge bg-warning text-dark ms-2">
 
-<td class="text-center">
+                                Master
 
-{% if admin.active %}
+                            </span>
 
-<span class="badge bg-success">
+                            {% endif %}
 
-Active
+                        </td>
 
-</span>
+                        <td>
 
-{% else %}
+                            {{ admin.role }}
 
-<span class="badge bg-danger">
+                        </td>
 
-Disabled
+                        <td class="text-center">
 
-</span>
+                            {% if admin.active %}
 
-{% endif %}
+                            <span class="badge bg-success">
 
-</td>
+                                Active
 
-<td class="text-center">
+                            </span>
 
-{% if admin.role != "Master" %}
+                            {% else %}
 
-    {% if admin.active %}
+                            <span class="badge bg-danger">
 
-    <a href="/admin/manage-admin/{{ admin.id }}"
-       class="btn btn-outline-primary">
+                                Disabled
 
-        Manage
+                            </span>
 
-    </a>
-    {% else %}
-        <form method="POST"
-          action="/admin/enable-admin/{{ admin.id }}">
+                            {% endif %}
 
-        <button type="submit" class="btn btn-outline-success">
-            Activate
-        </button>
+                        </td>
 
-    </form>
+                        <td class="text-center">
 
-    {% endif %}
-{% else %}
+                            {% if admin.role != "Master" %}
 
-<span class="text-secondary">
+                                {% if admin.active %}
 
-Not Editable
+                                <a
+                                    href="/admin/manage-admin/{{ admin.id }}"
+                                    class="btn btn-outline-primary w-100">
 
-</span>
+                                    Manage
 
-{% endif %}
+                                </a>
 
-</td>
+                                {% else %}
 
-<td class="text-center">
+                                <form
+                                    method="POST"
+                                    action="/admin/enable-admin/{{ admin.id }}">
 
-{% if admin.role != "Master" %}
+                                    <button
+                                        type="submit"
+                                        class="btn btn-outline-success w-100">
 
-<form method="POST"
-      action="{{ url_for('delete_admin', admin_id=admin.id) }}"
-      onsubmit="return confirm('Are you sure you want to permanently delete this admin account?');">
+                                        Activate
 
-    <button type="submit" class="btn btn-outline-danger">
-        Delete Account
-    </button>
+                                    </button>
 
-</form>
+                                </form>
 
-{% endif %}
+                                {% endif %}
 
-</td>
+                            {% else %}
 
-</tr>
+                            <span class="text-secondary">
 
-{% endfor %}
+                                Not Editable
 
-</tbody>
+                            </span>
 
-</table>
+                            {% endif %}
 
-</div>
+                        </td>
+
+                        <td class="text-center">
+
+                            {% if admin.role != "Master" %}
+                            <form
+                                method="POST"
+                                action="{{ url_for('delete_admin', admin_id=admin.id) }}"
+                                onsubmit="return confirm('Are you sure you want to permanently delete this admin account?');">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-outline-danger w-100">
+
+                                    Delete Account
+
+                                </button>
+
+                            </form>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>
 

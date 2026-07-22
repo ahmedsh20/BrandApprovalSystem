@@ -18,99 +18,113 @@ Manage Admin
 
 {% block content %}
 
-<div class="container" style="max-width:600px;">
+<div class="row justify-content-center">
 
-<div class="card shadow">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6">
 
-<div class="card-body">
+        <div class="card shadow">
 
-<h2 class="mb-4">
+            <div class="card-body p-4 p-md-5">
 
-Manage Admin
+                <h2 class="mb-4 text-center">
 
-</h2>
+                    Manage Admin
 
-<form method="POST">
+                </h2>
 
-<div class="mb-3">
+                <form method="POST">
 
-<label class="form-label">
+                    <div class="mb-4">
 
-Username
+                        <label class="form-label">
 
-</label>
+                            Username
 
-<input
-type="text"
-class="form-control"
-value="{{ admin.username }}"
-style="font-weight: bold; color: black;"
-disabled>
+                        </label>
 
-</div>
+                        <input
+                            type="text"
+                            class="form-control fw-bold"
+                            value="{{ admin.username }}"
+                            disabled>
 
-<div class="form-check mb-3">
+                    </div>
 
-<input
-class="form-check-input"
-type="checkbox"
-name="can_review"
-id="review"
-{% if admin.can_review %}checked{% endif %}>
+                    <div class="form-check mb-3">
 
-<label class="form-check-label" for="review">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="can_review"
+                            id="review"
+                            {% if admin.can_review %}checked{% endif %}>
 
-Can Accept/Reject
-</label>
+                        <label
+                            class="form-check-label"
+                            for="review">
 
-</div>
+                            Can Accept/Reject
 
-<div class="form-check mb-3">
+                        </label>
 
-<input
-class="form-check-input"
-type="checkbox"
-name="can_edit"
-id="edit"
-{% if admin.can_edit %}checked{% endif %}>
+                    </div>
 
-<label class="form-check-label" for="edit">
+                    <div class="form-check mb-3">
 
-Can Edit Decisions
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="can_edit"
+                            id="edit"
+                            {% if admin.can_edit %}checked{% endif %}>
 
-</label>
+                        <label
+                            class="form-check-label"
+                            for="edit">
 
-</div>
+                            Can Edit Decisions
 
-<div class="form-check mb-4">
+                        </label>
 
-<input
-class="form-check-input"
-type="checkbox"
-name="active"
-id="active"
-{% if admin.active %}checked{% endif %}>
+                    </div>
 
-<label class="form-check-label" for="active">
+                    <div class="form-check mb-4">
 
-Account Active
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="active"
+                            id="active"
+                            {% if admin.active %}checked{% endif %}>
 
-</label>
+                        <label
+                            class="form-check-label"
+                            for="active">
 
-</div>
+                            Account Active
 
-<div class="text-center mt-4">
-    <button class="btn btn-success">
+                        </label>
 
-        Save Changes
+                    </div>
 
-    </button>
-</div>
-</form>
+                    <div class="d-grid">
 
-</div>
+                        <button
+                            class="btn btn-success btn-lg">
 
-</div>
+                            Save Changes
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
