@@ -23,11 +23,11 @@
 
     <div class="container">
 
-        <a class="navbar-brand" href="/">
+        <a class="navbar-brand" style="color: #FFD700;" href="/">
             Oscars Brand Approval System
         </a>
 
-        <div class="navbar-nav ms-auto">
+        <div class="navbar-nav ms-auto align-items-center">
 
             {% block navbar %}
 
@@ -39,29 +39,33 @@
 
 </nav>
 
-<div class="row align-items-center mb-4">
+<div class="container">
 
-    <!-- Left side (empty by default) -->
-    <div class="col-3">
+    <div class="row align-items-center mb-4">
 
-        {% block left_panel %}
+        <!-- Left side -->
+        <div class="col-3">
 
-        {% endblock %}
+            {% block left_panel %}
+
+            {% endblock %}
+
+        </div>
+
+        <!-- Center logo -->
+        <div class="col-6 text-center">
+
+            <img
+                src="{{ url_for('static', filename='Logo.PNG') }}"
+                class="img-fluid"
+                style="max-width:180px;">
+
+        </div>
+
+        <!-- Empty right side to keep logo centered -->
+        <div class="col-3"></div>
 
     </div>
-
-    <!-- Center logo -->
-    <div class="col-6 text-center">
-
-        <img
-            src="{{ url_for('static', filename='Logo.PNG') }}"
-            class="img-fluid"
-            style="max-width:180px;">
-
-    </div>
-
-    <!-- Empty right side to keep logo centered -->
-    <div class="col-3"></div>
 
 </div>
 <div class="container py-5">
@@ -87,6 +91,11 @@
         sessionStorage.setItem("scrollPos", window.scrollY);
     });
 </script>
+
+<footer class="text-center text-white mt-4">
+    © 2026 Brand Contact Approval System
+</footer>
+
 
 </body>
 

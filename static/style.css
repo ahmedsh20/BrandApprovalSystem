@@ -95,3 +95,6 @@ a[href^="tel:"]:hover{
     text-decoration-thickness: 2px;
     opacity: 0.9;
 }
+html {
+    overflow-y: scroll;
+}
