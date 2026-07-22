@@ -161,6 +161,24 @@ Review Submission
 
     </div>
 
+    {% if session.get("admin_role") == "Master" %}
+
+        <div class="text-center mt-3">
+
+            <form action="/admin/delete-submission/{{ submission.id }}"
+                  method="POST"
+                  onsubmit="return confirm('Are you sure you want to permanently delete this request? This action cannot be undone.');">
+
+               <button type="submit" class="btn btn-outline-danger btn-lg">
+                    Delete Request
+                </button>
+
+            </form>
+
+        </div>
+
+        {% endif %}
+    
     {% endif %}
 
 
@@ -197,6 +215,20 @@ Review Submission
             Edit Submission
 
         </a>
+
+    </div>
+
+    <div class="text-center mt-3">
+
+        <form action="/admin/delete-submission/{{ submission.id }}"
+              method="POST"
+              onsubmit="return confirm('Are you sure you want to permanently delete this request? This action cannot be undone.');">
+
+           <button type="submit" class="btn btn-outline-danger btn-lg">
+                Delete Request
+            </button>
+
+        </form>
 
     </div>
 

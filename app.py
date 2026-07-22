@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, send_file
+from flask import Flask, render_template, request, redirect, session, send_file, flash
 from models import db, BrandSubmission, Admin, RegistrationRequest, AdminActivity
 from werkzeug.security import generate_password_hash
 from sqlalchemy import or_, case
@@ -9,6 +9,9 @@ from datetime import timedelta
 import os
 import webbrowser
 import threading
+import atexit
+
+LOCK_FILE = ".browser_opened"
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "development-secret-key")
@@ -24,7 +27,7 @@ def current_admin():
     if not admin_id:
         return None
 
-    return Admin.query.get(admin_id)
+    admin = db.session.get(Admin, admin_id)
 
     if not admin:
         return None
@@ -156,7 +159,7 @@ def admin():
                 if not admin.active:
 
                     return render_template(
-                        "login.html",
+                        "admin_login.html",
                         error="This account has been disabled by the Master administrator."
                     )
                 session["admin_logged_in"] = True
@@ -505,6 +508,32 @@ def manage_admin(id):
         admin=admin
     )
 
+@app.route("/admin/enable-admin/<int:admin_id>", methods=["POST"])
+def enable_admin(admin_id):
+
+    admin = current_admin()
+
+    if not admin:
+        return redirect("/login")
+
+    if admin.role != "Master":
+        return redirect("/admin/manage-admins")
+
+    admin_to_enable = Admin.query.get_or_404(admin_id)
+
+    admin_to_enable.active = True
+
+    activity = AdminActivity(
+        admin_username=admin.username,
+        action="Enabled",
+        target=admin_to_enable.username
+    )
+
+    db.session.add(activity)
+    db.session.commit()
+
+    return redirect("/admin/manage-admins")
+
 @app.route("/logout")
 def logout():
 
@@ -614,20 +643,69 @@ def delete_admin(admin_id):
 
     if admin.role != "Master":
         flash("Only the Master can delete accounts.", "danger")
-        return redirect("/admin/management")
+        return redirect("/admin/manage-admins")
 
     admin_to_delete = Admin.query.get_or_404(admin_id)
 
     if admin_to_delete.id == admin.id:
         flash("You cannot delete your own account.", "danger")
-        return redirect("/admin/management")
+        return redirect("/admin/manage-admins")
+
+    activity = AdminActivity(
+       admin_username=admin.username,
+        action="Deleted",
+        target=admin_to_delete.username
+    )
 
     db.session.delete(admin_to_delete)
     db.session.commit()
 
     flash("Admin account deleted successfully.", "success")
 
-    return redirect("/admin/management")
+    return redirect("/admin/manage-admins")
+
+@app.route("/admin/clear-activity-log", methods=["POST"])
+def clear_activity_log():
+
+    admin = current_admin()
+
+    if not admin:
+        return redirect("/login")
+
+    if admin.role != "Master":
+        return redirect("/admin/activity-log")
+
+    # Remove every activity log
+    AdminActivity.query.delete()
+
+    db.session.commit()
+
+    return redirect("/admin/activity-log")
+
+@app.route("/admin/delete-submission/<int:submission_id>", methods=["POST"])
+def delete_submission(submission_id):
+
+    admin = current_admin()
+
+    if not admin:
+        return redirect("/login")
+
+    if admin.role != "Master":
+        flash("Only the Master can delete requests.", "danger")
+        return redirect("/admin/dashboard")
+
+    submission = BrandSubmission.query.get_or_404(submission_id)
+
+    activity = AdminActivity(
+        admin_username=admin.username,
+        action="Deleted Request",
+        target=submission.brand_name
+    )
+
+    db.session.delete(submission)
+    db.session.commit()
+
+    return redirect("/admin/dashboard")
 
 @app.route("/admin/activity-log")
 def activity_log():
@@ -649,7 +727,16 @@ def activity_log():
     )
 
 def open_browser():
-    webbrowser.open("http://127.0.0.1:5000")
+    if not os.path.exists(LOCK_FILE):
+        webbrowser.open("http://127.0.0.1:5000")
+        with open(LOCK_FILE, "w") as f:
+            f.write("opened")
+
+def remove_lock():
+    if os.path.exists(LOCK_FILE):
+        os.remove(LOCK_FILE)
+
+atexit.register(remove_lock)
 
 if __name__ == "__main__":
     with app.app_context():

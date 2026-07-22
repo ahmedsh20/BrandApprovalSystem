@@ -96,13 +96,25 @@ Disabled
 
 {% if admin.role != "Master" %}
 
-<a href="/admin/manage-admin/{{ admin.id }}"
-   class="btn btn-primary">
+    {% if admin.active %}
 
-    Manage
+    <a href="/admin/manage-admin/{{ admin.id }}"
+       class="btn btn-outline-primary">
 
-</a>
+        Manage
 
+    </a>
+    {% else %}
+        <form method="POST"
+          action="/admin/enable-admin/{{ admin.id }}">
+
+        <button type="submit" class="btn btn-outline-success">
+            Activate
+        </button>
+
+    </form>
+
+    {% endif %}
 {% else %}
 
 <span class="text-secondary">
@@ -123,7 +135,7 @@ Not Editable
       action="{{ url_for('delete_admin', admin_id=admin.id) }}"
       onsubmit="return confirm('Are you sure you want to permanently delete this admin account?');">
 
-    <button type="submit" class="btn btn-danger btn-sm">
+    <button type="submit" class="btn btn-outline-danger">
         Delete Account
     </button>
 
