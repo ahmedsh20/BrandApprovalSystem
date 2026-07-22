@@ -55,6 +55,9 @@ class Admin(db.Model):
         db.Boolean,
         default=True
     )
+    
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
 
@@ -62,6 +65,7 @@ class Admin(db.Model):
             self.password_hash,
             password
         )    
+    
 class RegistrationRequest(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
