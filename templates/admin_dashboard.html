@@ -19,10 +19,6 @@ Dashboard
     </span>
 </span>
 
-<a class="nav-link text-white" href="/logout">
-    🚪 Logout
-</a>
-
 {% if session.get("admin_role") == "Master" %}
 
 <a class="nav-link text-white" href="/admin/pending-registrations">
@@ -33,11 +29,14 @@ Dashboard
     🔑 Admin Management
 </a>
 
-
 {% endif %}
 
 <a class="nav-link text-white" href="/admin/activity-log">
     📜 Activity Log
+</a>
+
+<a class="nav-link text-white" href="/logout">
+    🚪 Logout
 </a>
 
 {% endblock %}

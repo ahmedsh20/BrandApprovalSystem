@@ -607,7 +607,7 @@ def export_submissions():
 @app.route("/admin/activity-log")
 def activity_log():
 
-    admin = require_master()
+    admin = current_admin()
 
     if not admin:
         return redirect("/admin/dashboard")
