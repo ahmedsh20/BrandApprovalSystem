@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}
+Transfer Request
+{% endblock %}
+
+{% block navbar %}
+
+<a class="nav-link text-white" href="/admin/review/{{ submission.id }}">
+    ⬅ <span class="nav-text">Back</span>
+</a>
+
+<a class="nav-link text-white" href="/logout">
+    🚪 <span class="nav-text">Logout</span>
+</a>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-12 col-sm-11 col-md-9 col-lg-6">
+
+        <div class="card shadow">
+
+            <div class="card-body p-4 p-md-5">
+
+                <h2 class="mb-4 text-center">
+
+                    Transfer Request
+
+                </h2>
+
+                <div class="mb-4">
+
+                    <p class="mb-1">
+                        Brand:
+                        <strong>{{ submission.brand_name }}</strong>
+                    </p>
+
+                    <p class="mb-0">
+                        Current owner:
+                        <strong>{{ submission.student_name }}</strong>
+                        ({{ submission.bue_id }})
+                    </p>
+
+                </div>
+
+                <div class="alert alert-warning">
+
+                    The request will belong to the new student as if they
+                    had submitted it. The current student will no longer see
+                    it, and any feedback already posted on it moves with it.
+
+                </div>
+
+                {% if error %}
+
+                <div class="alert alert-danger text-center">
+
+                    {{ error }}
+
+                </div>
+
+                {% endif %}
+
+                <form
+                    method="POST"
+                    onsubmit="return confirm('Transfer this request to the new student? The current student will lose access to it.');">
+
+                    <div class="mb-3">
+
+                        <label class="form-label" for="new_student_name">
+
+                            New student name
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="new_student_name"
+                            name="new_student_name"
+                            maxlength="100"
+                            value="{{ request.form.get('new_student_name', '') }}"
+                            required>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <label class="form-label" for="new_bue_id">
+
+                            New BUE ID
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="new_bue_id"
+                            name="new_bue_id"
+                            maxlength="30"
+                            autocomplete="off"
+                            value="{{ request.form.get('new_bue_id', '') }}"
+                            required>
+
+                    </div>
+
+                    <div class="d-grid">
+
+                        <button
+                            type="submit"
+                            class="btn btn-warning btn-lg">
+
+                            Transfer Request
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

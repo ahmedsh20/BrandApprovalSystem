@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Feedbacks
+{% endblock %}
+
+{% block navbar %}
+
+<a class="nav-link text-white" href="{{ url_for('my_requests') }}">
+    ⬅ <span class="nav-text">Back</span>
+</a>
+
+<a class="nav-link text-white" href="/">
+    🏠 <span class="nav-text">Home</span>
+</a>
+
+<a class="nav-link text-white" href="/register">
+    📝 <span class="nav-text">Register</span>
+</a>
+
+<a class="nav-link text-white" href="/login">
+    🔐 <span class="nav-text">Admin Login</span>
+</a>
+
+{% endblock %}
+
+{% block content %}
+
+<h2 class="text-center mb-2" style="color: #FFD700;">
+
+    My Feedbacks
+
+</h2>
+
+<p class="text-center mb-4">
+
+    Brand:
+    <strong>{{ submission.brand_name }}</strong>
+
+</p>
+
+{% if feedbacks %}
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table class="table table-dark table-hover align-middle mb-0">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Posted</th>
+
+                        <th>Feedback</th>
+
+                        <th class="text-center">Read</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for feedback in feedbacks %}
+
+                    <tr>
+
+                        <td class="text-nowrap">
+
+                            {{ feedback.created_at|localtime }}
+
+                        </td>
+
+                        <td>
+
+                            {{ feedback.message|truncate(90, True) }}
+
+                        </td>
+
+                        <td class="text-center">
+
+                            
+                                href="{{ url_for('read_feedback', submission_id=submission.id, feedback_id=feedback.id) }}"
+                                class="btn btn-outline-info btn-sm">
+
+                                Read
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <div class="card-footer bg-transparent border-0">
+
+        <div class="d-grid">
+
+            
+                href="{{ url_for('post_feedback', submission_id=submission.id) }}"
+                class="btn btn-primary btn-lg">
+
+                Post Another Feedback
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% else %}
+
+<div class="alert alert-warning text-center">
+
+    You have not posted any feedback on this request yet.
+
+</div>
+
+<div class="text-center mt-3">
+
+    
+        class="btn btn-primary"
+        href="{{ url_for('post_feedback', submission_id=submission.id) }}">
+
+        Post Feedback
+
+    </a>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

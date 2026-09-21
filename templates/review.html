@@ -197,6 +197,32 @@ Review Submission
 
                     </tr>
 
+                    <tr>
+
+                        <th>
+
+                            Submitted On
+
+                        </th>
+
+                        <td>
+
+                            {% if submission.created_at %}
+
+                                {{ submission.created_at|localtime }}
+
+                            {% else %}
+
+                                <span class="text-secondary">
+                                    Not recorded (submitted before dates were tracked)
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
                 </table>
 
             </div>
@@ -332,6 +358,27 @@ Review Submission
                 {% endif %}
 
             {% endif %}
+
+                        {% if session.get("admin_role") == "Master" %}
+
+            <div class="row mt-3">
+
+                <div class="col-12 text-center">
+
+                    
+                        href="/admin/transfer/{{ submission.id }}"
+                        class="btn btn-outline-warning btn-lg w-100">
+
+                        Transfer Ownership
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
         </div>
 
     </div>

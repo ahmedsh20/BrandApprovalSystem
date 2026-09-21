@@ -1,12 +1,17 @@
-from flask import Flask, render_template, request, redirect, session, send_file, flash
-from models import db, BrandSubmission, Admin, RegistrationRequest, AdminActivity
+from flask import Flask, render_template, request, redirect, session, send_file, flash, jsonify, url_for
+from models import db, BrandSubmission, Admin, RegistrationRequest, AdminActivity, Feedback
 from werkzeug.security import generate_password_hash
-from sqlalchemy import or_, case
+from sqlalchemy import or_, case, func, inspect, text
 from io import BytesIO
 from openpyxl import Workbook
 from zoneinfo import ZoneInfo
-from datetime import timedelta
+from datetime import timedelta, timezone
 import os
+import re
+import hashlib
+import smtplib
+from email.message import EmailMessage
+from itsdangerous import URLSafeTimedSerializer, BadSignature
 import webbrowser
 import threading
 import atexit
@@ -19,6 +24,143 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
+
+MAX_FEEDBACK_LENGTH = 2000
+
+# Times are stored in UTC and shown in local (Cairo) time.
+# If the time zone database is missing (e.g. Windows without the
+# "tzdata" package) we fall back to a fixed UTC+3 offset.
+try:
+    LOCAL_TZ = ZoneInfo("Africa/Cairo")
+except Exception:
+    LOCAL_TZ = None
+
+def to_local(dt):
+
+    if dt is None:
+        return None
+
+    if LOCAL_TZ:
+        return dt.replace(tzinfo=timezone.utc).astimezone(LOCAL_TZ)
+
+    return dt + timedelta(hours=3)
+
+@app.template_filter("localtime")
+def localtime_filter(dt, fmt="%d/%m/%Y %I:%M %p"):
+
+    local = to_local(dt)
+
+    if local is None:
+        return ""
+
+    return local.strftime(fmt)
+
+def ensure_schema():
+    # Creates any missing tables (e.g. Feedback) and adds the
+    # created_at column to an existing brand_submission table.
+    # Safe to run every time; existing data is never touched.
+    try:
+        with app.app_context():
+
+            db.create_all()
+
+            # Columns added after the first version of the database.
+            new_columns = {
+                "brand_submission": [("created_at", "TIMESTAMP")],
+                "admin": [("email", "VARCHAR(150)")],
+                "registration_request": [("email", "VARCHAR(150)")]
+            }
+
+            inspector = inspect(db.engine)
+
+            for table, columns in new_columns.items():
+
+                existing = [
+                    c["name"] for c in inspector.get_columns(table)
+                ]
+
+                for name, sql_type in columns:
+
+                    if name not in existing:
+                        with db.engine.begin() as connection:
+                            connection.execute(text(
+                                'ALTER TABLE "%s" ADD COLUMN %s %s'
+                                % (table, name, sql_type)
+                            ))
+                            
+    except Exception as error:
+        print("Schema check failed:", error)
+
+ensure_schema()
+
+# ---------- password reset helpers ----------
+
+EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+RESET_TOKEN_MAX_AGE = 30 * 60   # reset links work for 30 minutes
+
+def reset_serializer():
+    return URLSafeTimedSerializer(app.secret_key, salt="admin-password-reset")
+
+def password_fingerprint(admin):
+    # Changes whenever the password changes, so a reset link can only be
+    # used once and old logins stop working after a reset.
+    return hashlib.sha256(admin.password_hash.encode()).hexdigest()[:20]
+
+def make_reset_token(admin):
+    return reset_serializer().dumps({
+        "id": admin.id,
+        "fp": password_fingerprint(admin)
+    })
+
+def admin_from_reset_token(token):
+
+    try:
+        data = reset_serializer().loads(token, max_age=RESET_TOKEN_MAX_AGE)
+    except BadSignature:   # also covers expired links
+        return None
+
+    admin = db.session.get(Admin, data.get("id"))
+
+    if not admin or not admin.active:
+        return None
+
+    if data.get("fp") != password_fingerprint(admin):
+        return None
+
+    return admin
+
+def send_email(to_address, subject, body):
+
+    username = os.environ.get("MAIL_USERNAME")
+    password = os.environ.get("MAIL_PASSWORD")
+
+    if not username or not password:
+        print("Email not sent: MAIL_USERNAME / MAIL_PASSWORD are not set.")
+        if app.debug:
+            print("Would have sent to", to_address, ":\n" + body)
+        return False
+
+    message = EmailMessage()
+    message["Subject"] = subject
+    message["From"] = os.environ.get("MAIL_FROM", username)
+    message["To"] = to_address
+    message.set_content(body)
+
+    try:
+        with smtplib.SMTP(
+            os.environ.get("MAIL_SERVER", "smtp.gmail.com"),
+            int(os.environ.get("MAIL_PORT", "587")),
+            timeout=15
+        ) as smtp:
+            smtp.starttls()
+            smtp.login(username, password)
+            smtp.send_message(message)
+        return True
+
+    except Exception as error:
+        print("Could not send email:", error)
+        return False
 
 def current_admin():
 
@@ -52,13 +194,92 @@ def require_master():
 
     return admin
 
+@app.before_request
+def enforce_admin_session():
+
+    # Runs on every request. If the logged-in admin was deactivated
+    # or deleted, the session is closed immediately.
+    if request.endpoint in (None, "static", "session_check"):
+        return
+
+    admin_id = session.get("admin_id")
+
+    if not admin_id:
+        return
+
+    admin = db.session.get(Admin, admin_id)
+
+    if not admin or not admin.active:
+
+        reason = "removed" if not admin else "deactivated"
+
+        session.clear()
+
+        # A login attempt with a stale cookie should still go through.
+        if request.endpoint == "admin" and request.method == "POST":
+            return
+
+        return redirect("/login?reason=" + reason)
+
+    # A password change (e.g. a reset) ends every older login.
+    fingerprint = password_fingerprint(admin)
+
+    if session.get("pw_fp") is None:
+        session["pw_fp"] = fingerprint
+
+    elif session.get("pw_fp") != fingerprint:
+        session.clear()
+        return redirect("/login?reason=expired")
+
+    # Keep the cached values in the session in sync with the database
+    # so permission changes apply without waiting for a new login.
+    fresh = {
+        "admin_role": admin.role,
+        "admin_username": admin.username,
+        "can_review": admin.role == "Master" or bool(admin.can_review),
+        "can_edit": admin.role == "Master" or bool(admin.can_edit)
+    }
+
+    for key, value in fresh.items():
+        if session.get(key) != value:
+            session[key] = value
+
+@app.route("/admin/session-check")
+def session_check():
+
+    # Polled by open admin pages (see base.html) so a deactivated
+    # admin is sent to the login page without having to click.
+    admin_id = session.get("admin_id")
+
+    if not admin_id:
+        response = jsonify(ok=False, reason="expired")
+
+    else:
+
+        admin = db.session.get(Admin, admin_id)
+
+        if not admin:
+            session.clear()
+            response = jsonify(ok=False, reason="removed")
+
+        elif not admin.active:
+            session.clear()
+            response = jsonify(ok=False, reason="deactivated")
+
+        else:
+            response = jsonify(ok=True)
+
+    response.headers["Cache-Control"] = "no-store"
+
+    return response
+
 @app.route("/", methods=["GET", "POST"])
 def home():
 
     if request.method == "POST":
 
         student_name = request.form["student_name"]
-        bue_id = request.form["bue_id"]
+        bue_id = request.form["bue_id"].strip()
         brand_name = request.form["brand_name"]
         social_link = request.form["social_link"]
         category = request.form["category"]
@@ -92,9 +313,18 @@ def register():
 
         username = request.form["username"]
 
+        email = request.form.get("email", "").strip()
+
         password = request.form["password"]
 
         confirm = request.form["confirm_password"]
+
+        if not EMAIL_PATTERN.match(email) or len(email) > 150:
+
+            return render_template(
+                "register.html",
+                error="Please enter a valid email address."
+            )
 
         if password != confirm:
 
@@ -119,14 +349,9 @@ def register():
 
         request_account = RegistrationRequest(
             username=username,
-            password_hash=""
-        )
-
-        request_account = RegistrationRequest(
-            username=username,
+            email=email,
             password_hash=generate_password_hash(password)
         )
-
         db.session.add(request_account)
 
         db.session.commit()
@@ -206,9 +431,130 @@ def admin():
            error="Invalid username or password."
         )
 
+    reasons = {
+        "deactivated": "Your account has been deactivated by the Master administrator. You have been signed out.",
+        "removed": "Your account no longer exists. You have been signed out.",
+        "expired": "Your session has ended. Please log in again."
+    }
+
+    success = None
+
+    if request.args.get("reset") == "1":
+        success = "Your password has been changed. You can now log in."
+
     return render_template(
         "admin_login.html",
-        error=None
+        error=reasons.get(request.args.get("reason")),
+        success=success
+    )
+
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+
+    sent = False
+
+    if request.method == "POST":
+
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip().lower()
+
+        admin = Admin.query.filter_by(username=username).first()
+
+        # The link is only ever sent to the email saved on the account,
+        # never to whatever address was typed into this form.
+        if (
+            admin
+            and admin.active
+            and admin.email
+            and admin.email.strip().lower() == email
+        ):
+
+            base_url = os.environ.get("SITE_URL", "").rstrip("/")
+
+            path = url_for("reset_password", token=make_reset_token(admin))
+
+            link = (base_url + path) if base_url else request.host_url.rstrip("/") + path
+
+            send_email(
+                admin.email,
+                "Reset your admin password",
+                "Hello " + admin.username + ",\n\n"
+                "Use the link below to choose a new password. "
+                "It works once and expires in 30 minutes.\n\n"
+                + link + "\n\n"
+                "If you did not ask for this, ignore this email; "
+                "your password will not change.\n"
+            )
+
+        # Same answer whether or not the details matched, so nobody can
+        # use this page to find out which usernames or emails exist.
+        sent = True
+
+    return render_template("forgot_password.html", sent=sent)
+
+@app.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+
+    admin = admin_from_reset_token(token)
+
+    if not admin:
+        return render_template("reset_password.html", invalid=True)
+
+    error = None
+
+    if request.method == "POST":
+
+        password = request.form.get("password", "")
+        confirm = request.form.get("confirm_password", "")
+
+        if password != confirm:
+            error = "Passwords do not match."
+
+        elif len(password) < 8:
+            error = "Password must be at least 8 characters."
+
+        else:
+
+            admin.set_password(password)
+
+            db.session.commit()
+
+            return redirect("/login?reset=1")
+
+    return render_template("reset_password.html", invalid=False, error=error)
+
+@app.route("/admin/account", methods=["GET", "POST"])
+def admin_account():
+
+    admin = current_admin()
+
+    if not admin:
+        return redirect("/login")
+
+    error = None
+    success = None
+
+    if request.method == "POST":
+
+        email = request.form.get("email", "").strip()
+        current_password = request.form.get("current_password", "")
+
+        if not admin.check_password(current_password):
+            error = "Current password is incorrect."
+
+        elif not EMAIL_PATTERN.match(email) or len(email) > 150:
+            error = "Please enter a valid email address."
+
+        else:
+            admin.email = email
+            db.session.commit()
+            success = "Your email has been saved."
+
+    return render_template(
+        "admin_account.html",
+        admin=admin,
+        error=error,
+        success=success
     )
 
 @app.route("/admin")
@@ -336,6 +682,7 @@ def approve_registration(id):
     new_admin = Admin(
         username=request_account.username,
         password_hash=request_account.password_hash,
+        email=request_account.email,
         role="Admin",
         can_review=False,
         active=True
@@ -551,29 +898,212 @@ def check_status():
 
     if request.method == "POST":
 
-        bue_id = request.form["bue_id"]
+        # The BUE ID the student typed is remembered for this browser
+        # session so the requests and feedback pages know whose they are.
+        session["student_bue_id"] = request.form["bue_id"].strip()
 
-        submissions = (
-            BrandSubmission.query
-            .filter_by(bue_id=bue_id)
-            .order_by(
-                case(
-                    (BrandSubmission.status == "Accepted", 0),
-                    (BrandSubmission.status == "Pending", 1),
-                    (BrandSubmission.status == "Rejected", 2),
-                    else_=3
-                ),
-                BrandSubmission.id.desc()
-            ).all()
-        )
-
-        return render_template(
-            "status_results.html",
-            submissions=submissions,
-            admin=admin,
-        )
+        return redirect("/my-requests")
 
     return render_template("check_status.html")
+
+def student_submission(submission_id):
+
+    # Returns the request only if it belongs to the student
+    # currently "signed in" by BUE ID, otherwise None.
+    bue_id = session.get("student_bue_id")
+
+    if not bue_id:
+        return None
+
+    submission = db.session.get(BrandSubmission, submission_id)
+
+    if not submission or submission.bue_id != bue_id:
+        return None
+
+    return submission
+
+@app.route("/my-requests")
+def my_requests():
+
+    bue_id = session.get("student_bue_id")
+
+    if not bue_id:
+        return redirect("/check-status")
+
+    submissions = (
+        BrandSubmission.query
+        .filter_by(bue_id=bue_id)
+        .order_by(
+            case(
+                (BrandSubmission.status == "Accepted", 0),
+                (BrandSubmission.status == "Pending", 1),
+                (BrandSubmission.status == "Rejected", 2),
+                else_=3
+            ),
+            BrandSubmission.id.desc()
+        ).all()
+    )
+
+    feedback_counts = {}
+
+    if submissions:
+        feedback_counts = dict(
+            db.session.query(Feedback.submission_id, func.count(Feedback.id))
+            .filter(Feedback.submission_id.in_([s.id for s in submissions]))
+            .group_by(Feedback.submission_id)
+            .all()
+        )
+
+    return render_template(
+        "status_results.html",
+        submissions=submissions,
+        feedback_counts=feedback_counts
+    )
+
+@app.route("/my-requests/<int:submission_id>/feedback", methods=["GET", "POST"])
+def post_feedback(submission_id):
+
+    submission = student_submission(submission_id)
+
+    if not submission:
+        return redirect("/check-status")
+
+    if submission.status != "Accepted":
+        return redirect("/my-requests")
+
+    error = None
+    message = ""
+
+    if request.method == "POST":
+
+        message = request.form.get("message", "").strip()
+
+        if not message:
+            error = "Please write your feedback before submitting."
+
+        elif len(message) > MAX_FEEDBACK_LENGTH:
+            error = "Feedback is too long (maximum %d characters)." % MAX_FEEDBACK_LENGTH
+
+        else:
+
+            db.session.add(Feedback(
+                submission_id=submission.id,
+                message=message
+            ))
+
+            db.session.commit()
+
+            return redirect(url_for(
+                "feedback_submitted",
+                submission_id=submission.id
+            ))
+
+    return render_template(
+        "feedback_form.html",
+        submission=submission,
+        error=error,
+        message=message,
+        max_length=MAX_FEEDBACK_LENGTH
+    )
+
+@app.route("/my-requests/<int:submission_id>/feedback/submitted")
+def feedback_submitted(submission_id):
+
+    submission = student_submission(submission_id)
+
+    if not submission:
+        return redirect("/check-status")
+
+    return render_template(
+        "feedback_submitted.html",
+        submission=submission
+    )
+
+@app.route("/my-requests/<int:submission_id>/feedbacks")
+def show_feedbacks(submission_id):
+
+    submission = student_submission(submission_id)
+
+    if not submission:
+        return redirect("/check-status")
+
+    return render_template(
+        "feedback_list.html",
+        submission=submission,
+        feedbacks=submission.feedbacks
+    )
+
+@app.route("/my-requests/<int:submission_id>/feedbacks/<int:feedback_id>")
+def read_feedback(submission_id, feedback_id):
+
+    submission = student_submission(submission_id)
+
+    if not submission:
+        return redirect("/check-status")
+
+    feedback = Feedback.query.filter_by(
+        id=feedback_id,
+        submission_id=submission.id
+    ).first_or_404()
+
+    return render_template(
+        "feedback_detail.html",
+        submission=submission,
+        feedback=feedback
+    )
+
+@app.route("/admin/transfer/<int:id>", methods=["GET", "POST"])
+def transfer_request(id):
+
+    master = require_master()
+
+    if not master:
+        return redirect("/admin/dashboard")
+
+    submission = BrandSubmission.query.get_or_404(id)
+
+    error = None
+
+    if request.method == "POST":
+
+        new_name = request.form.get("new_student_name", "").strip()
+        new_bue_id = request.form.get("new_bue_id", "").strip()
+
+        if not new_name or not new_bue_id:
+            error = "Both the student name and the BUE ID are required."
+
+        elif len(new_name) > 100 or len(new_bue_id) > 30:
+            error = "The name or BUE ID is too long."
+
+        elif new_bue_id == submission.bue_id:
+            error = "This request already belongs to that BUE ID."
+
+        else:
+
+            old_name = submission.student_name
+            old_bue_id = submission.bue_id
+
+            submission.student_name = new_name
+            submission.bue_id = new_bue_id
+
+            db.session.add(AdminActivity(
+                admin_username=master.username,
+                action="Transferred",
+                target=(
+                    "%s: %s (%s) -> %s (%s)"
+                    % (submission.brand_name, old_name, old_bue_id, new_name, new_bue_id)
+                )[:255]
+            ))
+
+            db.session.commit()
+
+            return redirect("/admin/review/" + str(id))
+
+    return render_template(
+        "transfer_request.html",
+        submission=submission,
+        error=error
+    )
 
 @app.route("/admin/export")
 def export_submissions():
@@ -720,7 +1250,7 @@ def activity_log():
     ).all()
     for activity in activities:
 
-        activity.local_time = activity.local_time = activity.timestamp + timedelta(hours=3)
+        activity.local_time = to_local(activity.timestamp)
     return render_template(
         "activity_log.html",
         activities=activities

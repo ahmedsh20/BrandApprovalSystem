@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}
+Feedback Submitted
+{% endblock %}
+
+{% block navbar %}
+
+<a class="nav-link text-white" href="/">
+    🏠 <span class="nav-text">Home</span>
+</a>
+
+<a class="nav-link text-white" href="/register">
+    📝 <span class="nav-text">Register</span>
+</a>
+
+<a class="nav-link text-white" href="/login">
+    🔐 <span class="nav-text">Admin Login</span>
+</a>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-12 col-sm-11 col-md-9 col-lg-7">
+
+        <div class="card shadow text-center">
+
+            <div class="card-body p-4 p-md-5">
+
+                <h1 class="text-success mb-4">
+
+                    ✔ Feedback Submitted
+
+                </h1>
+
+                <p class="mb-4">
+
+                    Your feedback on
+                    <strong class="text-warning">{{ submission.brand_name }}</strong>
+                    has been submitted successfully.
+
+                </p>
+
+                <div class="d-grid gap-3">
+
+                    
+                        href="{{ url_for('post_feedback', submission_id=submission.id) }}"
+                        class="btn btn-primary btn-lg">
+
+                        Submit Another Feedback
+
+                    </a>
+
+                    
+                        href="{{ url_for('my_requests') }}"
+                        class="btn btn-outline-light btn-lg">
+
+                        Your Requests
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

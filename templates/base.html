@@ -116,6 +116,35 @@
     });
 </script>
 
+{% if session.get("admin_id") %}
+<script>
+    // Admin pages: if this account is deactivated or removed while the
+    // page is open, send the user to the login page within a few seconds.
+    (function () {
+        function checkSession() {
+            fetch("/admin/session-check", {
+                cache: "no-store",
+                credentials: "same-origin"
+            })
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (!data.ok) {
+                        window.location.href =
+                            "/login?reason=" + (data.reason || "expired");
+                    }
+                })
+                .catch(function () { /* offline: try again next time */ });
+        }
+
+        setInterval(checkSession, 5000);
+
+        document.addEventListener("visibilitychange", function () {
+            if (!document.hidden) { checkSession(); }
+        });
+    })();
+</script>
+{% endif %}
+
 </body>
 
 </html>

@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
 {% block title %}
-Admin Login
+My Account
 {% endblock %}
 
 {% block navbar %}
 
-<a class="nav-link text-white" href="/">
-    🏠 <span class="nav-text">Home</span>
+<a class="nav-link text-white" href="/admin/dashboard">
+    ⬅ <span class="nav-text">Back</span>
 </a>
 
-<a class="nav-link text-white" href="/register">
-    📝 <span class="nav-text">Register</span>
+<a class="nav-link text-white" href="/logout">
+    🚪 <span class="nav-text">Logout</span>
 </a>
 
 {% endblock %}
@@ -26,11 +26,18 @@ Admin Login
 
             <div class="card-body p-4 p-md-5">
 
-                <h2 class="text-center mb-4">
+                <h2 class="text-center mb-2">
 
-                    Admin Login
+                    My Account
 
                 </h2>
+
+                <p class="text-center mb-4">
+
+                    Username:
+                    <strong>{{ admin.username }}</strong>
+
+                </p>
 
                 {% if error %}
 
@@ -52,11 +59,12 @@ Admin Login
 
                 {% endif %}
 
-                {% if pending %}
+                {% if not admin.email %}
 
-                <div class="alert alert-warning text-center">
+                <div class="alert alert-warning">
 
-                    ⏳ Your registration request is currently waiting for approval by the Master Admin.
+                    No email is saved on this account yet, so "Forgot
+                    password?" will not work for you. Add one below.
 
                 </div>
 
@@ -68,15 +76,16 @@ Admin Login
 
                         <label class="form-label">
 
-                            Username
+                            Email (used to reset your password)
 
                         </label>
 
                         <input
                             class="form-control"
-                            type="text"
-                            name="username"
-                            autocomplete="username"
+                            type="email"
+                            name="email"
+                            maxlength="150"
+                            value="{{ admin.email or '' }}"
                             required>
 
                     </div>
@@ -85,35 +94,24 @@ Admin Login
 
                         <label class="form-label">
 
-                            Password
+                            Current password (to confirm the change)
 
                         </label>
 
                         <input
                             class="form-control"
                             type="password"
-                            name="password"
+                            name="current_password"
                             autocomplete="current-password"
                             required>
 
                     </div>
 
-                    <button
-                        class="btn btn-primary w-100">
+                    <button class="btn btn-primary w-100">
 
-                        Login
+                        Save Email
 
                     </button>
-
-                    <div class="text-center mt-3">
-
-                        <a href="/forgot-password" class="text-info">
-
-                            Forgot password?
-
-                        </a>
-
-                    </div>
 
                 </form>
 

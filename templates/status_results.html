@@ -50,6 +50,8 @@ My Requests
 
                         <th>Message</th>
 
+                        <th>Feedback</th>
+
                     </tr>
 
                 </thead>
@@ -148,6 +150,42 @@ My Requests
                                 Waiting for admin review.
 
                             </span>
+
+                        {% endif %}
+
+                        </td>
+
+                        <td>
+
+                        {% if submission.status == "Accepted" %}
+
+                        <div class="d-flex flex-column gap-2">
+
+                            
+                                href="{{ url_for('post_feedback', submission_id=submission.id) }}"
+                                class="btn btn-outline-warning btn-sm text-nowrap">
+
+                                💬 Post Feedback
+
+                            </a>
+
+                            {% if feedback_counts.get(submission.id) %}
+
+                            
+                                href="{{ url_for('show_feedbacks', submission_id=submission.id) }}"
+                                class="btn btn-outline-info btn-sm text-nowrap">
+
+                                📄 Show Feedbacks ({{ feedback_counts[submission.id] }})
+
+                            </a>
+
+                            {% endif %}
+
+                        </div>
+
+                        {% else %}
+
+                            <span class="text-secondary">—</span>
 
                         {% endif %}
 
