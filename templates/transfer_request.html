@@ -71,44 +71,44 @@ Transfer Request
 
                     <div class="mb-3">
 
-                        <label class="form-label" for="new_student_name">
+                        <label class="form-label" for="new_owner">Transfer to</label>
 
-                            New student name
+                        <select class="form-select" id="new_owner" name="new_owner" required>
 
-                        </label>
+                            <option value="" disabled {% if not request.form.get('new_owner') %}selected{% endif %}>Choose a student...</option>
 
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="new_student_name"
-                            name="new_student_name"
-                            maxlength="100"
-                            value="{{ request.form.get('new_student_name', '') }}"
-                            required>
+                            {% for bue_id, name in students %}
 
-                    </div>
+                            <option value="{{ bue_id }}" {% if request.form.get('new_owner') == bue_id %}selected{% endif %}>{{ name }} ({{ bue_id }})</option>
 
-                    <div class="mb-4">
+                            {% endfor %}
 
-                        <label class="form-label" for="new_bue_id">
+                            <option value="__other__" {% if request.form.get('new_owner') == '__other__' %}selected{% endif %}>Someone else (type name and BUE ID)</option>
 
-                            New BUE ID
-
-                        </label>
-
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="new_bue_id"
-                            name="new_bue_id"
-                            maxlength="30"
-                            autocomplete="off"
-                            value="{{ request.form.get('new_bue_id', '') }}"
-                            required>
+                        </select>
 
                     </div>
 
-                    <div class="d-grid">
+                    <div id="other-fields" style="display: none;">
+
+                        <div class="mb-3">
+
+                            <label class="form-label" for="new_student_name">New student name</label>
+
+                            <input type="text" class="form-control" id="new_student_name" name="new_student_name" maxlength="100" value="{{ request.form.get('new_student_name', '') }}">
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label" for="new_bue_id">New BUE ID</label>
+
+                            <input type="text" class="form-control" id="new_bue_id" name="new_bue_id" maxlength="30" autocomplete="off" value="{{ request.form.get('new_bue_id', '') }}">
+
+                        </div>
+
+                    </div>
+                    <div class="d-grid mt-4">
 
                         <button
                             type="submit"
@@ -129,5 +129,24 @@ Transfer Request
     </div>
 
 </div>
+
+<script>
+    (function () {
+        var select = document.getElementById("new_owner");
+        var other = document.getElementById("other-fields");
+        var nameInput = document.getElementById("new_student_name");
+        var idInput = document.getElementById("new_bue_id");
+
+        function update() {
+            var show = select.value === "__other__";
+            other.style.display = show ? "block" : "none";
+            nameInput.required = show;
+            idInput.required = show;
+        }
+
+        select.addEventListener("change", update);
+        update();
+    })();
+</script>
 
 {% endblock %}

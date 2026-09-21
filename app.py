@@ -1062,16 +1062,40 @@ def transfer_request(id):
 
     submission = BrandSubmission.query.get_or_404(id)
 
+    # Everyone who has posted a request: one entry per BUE ID, using the
+    # name from their newest request. Built on every page load, so a
+    # student who posts for the first time shows up automatically.
+    students = {}
+
+    rows = (
+        db.session.query(BrandSubmission.bue_id, BrandSubmission.student_name)
+        .order_by(BrandSubmission.id.desc())
+        .all()
+    )
+
+    for bue_id, name in rows:
+        if bue_id not in students:
+            students[bue_id] = name
+
+    students.pop(submission.bue_id, None)   # not the current owner
+
+    student_list = sorted(students.items(), key=lambda item: item[1].lower())
+
     error = None
 
     if request.method == "POST":
 
-        new_name = request.form.get("new_student_name", "").strip()
-        new_bue_id = request.form.get("new_bue_id", "").strip()
+        choice = request.form.get("new_owner", "")
+
+        if choice == "__other__":
+            new_name = request.form.get("new_student_name", "").strip()
+            new_bue_id = request.form.get("new_bue_id", "").strip()
+        else:
+            new_bue_id = choice
+            new_name = students.get(choice, "")
 
         if not new_name or not new_bue_id:
-            error = "Both the student name and the BUE ID are required."
-
+            error = "Please choose a student, or enter their name and BUE ID."
         elif len(new_name) > 100 or len(new_bue_id) > 30:
             error = "The name or BUE ID is too long."
 
@@ -1102,6 +1126,7 @@ def transfer_request(id):
     return render_template(
         "transfer_request.html",
         submission=submission,
+        students=student_list,
         error=error
     )
 
