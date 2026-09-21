@@ -100,7 +100,7 @@ class BrandSubmission(db.Model):
 
     status = db.Column(db.String(20), default="Pending")
 
-        # When the request was submitted (stored in UTC).
+    # When the request was submitted (stored in UTC).
     # Requests created before this column existed have no value.
     created_at = db.Column(
         db.DateTime,
@@ -116,19 +116,19 @@ class BrandSubmission(db.Model):
         order_by="Feedback.created_at.desc()"
     )
 
-    class Feedback(db.Model):
+class Feedback(db.Model):
 
-        id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
-        submission_id = db.Column(
-            db.Integer,
-            db.ForeignKey("brand_submission.id"),
-            nullable=False
-        )
+    submission_id = db.Column(
+        db.Integer,
+        db.ForeignKey("brand_submission.id"),
+        nullable=False
+    )
 
-        message = db.Column(db.Text, nullable=False)
+    message = db.Column(db.Text, nullable=False)
 
-        created_at = db.Column(
-            db.DateTime,
-            default=datetime.utcnow
-        )
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
