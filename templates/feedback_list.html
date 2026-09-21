@@ -84,7 +84,7 @@ My Feedbacks
                         <td class="text-center">
 
                             
-                                href="{{ url_for('read_feedback', submission_id=submission.id, feedback_id=feedback.id) }}"
+                            <a    href="{{ url_for('read_feedback', submission_id=submission.id, feedback_id=feedback.id) }}"
                                 class="btn btn-outline-info btn-sm">
 
                                 Read
@@ -110,7 +110,7 @@ My Feedbacks
         <div class="d-grid">
 
             
-                href="{{ url_for('post_feedback', submission_id=submission.id) }}"
+            <a    href="{{ url_for('post_feedback', submission_id=submission.id) }}"
                 class="btn btn-primary btn-lg">
 
                 Post Another Feedback
@@ -134,7 +134,7 @@ My Feedbacks
 <div class="text-center mt-3">
 
     
-        class="btn btn-primary"
+    <a    class="btn btn-primary"
         href="{{ url_for('post_feedback', submission_id=submission.id) }}">
 
         Post Feedback
