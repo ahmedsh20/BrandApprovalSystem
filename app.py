@@ -1130,6 +1130,22 @@ def transfer_request(id):
         error=error
     )
 
+@app.route("/admin/review/<int:id>/feedbacks")
+def admin_feedbacks(id):
+
+    admin = current_admin()
+
+    if not admin:
+        return redirect("/login")
+
+    submission = BrandSubmission.query.get_or_404(id)
+
+    return render_template(
+        "admin_feedbacks.html",
+        submission=submission,
+        feedbacks=submission.feedbacks
+    )
+
 @app.route("/admin/export")
 def export_submissions():
 

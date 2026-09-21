@@ -263,6 +263,20 @@ Review Submission
 
                 </div>
 
+            {% if submission.status == "Accepted" or submission.feedbacks %}
+
+            <div class="row mt-3">
+
+                <div class="col-12 text-center">
+
+                    <a href="/admin/review/{{ submission.id }}/feedbacks" class="btn btn-outline-info btn-lg w-100">💬 View Feedback ({{ submission.feedbacks|length }})</a>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
                 {% if session.get("admin_role") == "Master" %}
 
                 <div class="row mt-3">

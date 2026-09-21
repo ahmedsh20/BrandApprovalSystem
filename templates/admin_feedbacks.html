@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}
+Request Feedback
+{% endblock %}
+
+{% block navbar %}
+
+<a class="nav-link text-white" href="/admin/review/{{ submission.id }}">⬅ <span class="nav-text">Back</span></a>
+
+<a class="nav-link text-white" href="/logout">🚪 <span class="nav-text">Logout</span></a>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-12 col-md-10 col-lg-8">
+
+        <div class="card shadow">
+
+            <div class="card-body p-4 p-md-5">
+
+                <h2 class="mb-1">Feedback</h2>
+
+                <p class="mb-1">Brand: <strong>{{ submission.brand_name }}</strong></p>
+
+                <p class="mb-1">Student: <strong>{{ submission.student_name }}</strong> ({{ submission.bue_id }})</p>
+
+                <p class="text-secondary mb-4">{{ feedbacks|length }} feedback{{ "" if feedbacks|length == 1 else "s" }}, newest first</p>
+
+                {% if feedbacks %}
+
+                    {% for feedback in feedbacks %}
+
+                    <div class="p-3 mb-3" style="background-color: #2B2B2B; border-radius: 10px;">
+
+                        <p class="text-secondary small mb-2">Posted on {{ feedback.created_at|localtime }}</p>
+
+                        <p class="mb-0" style="white-space: pre-wrap; word-break: break-word;">{{ feedback.message }}</p>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                <div class="alert alert-warning text-center mb-0">No feedback has been posted on this request yet.</div>
+
+                {% endif %}
+
+                <div class="d-grid mt-4">
+
+                    <a href="/admin/review/{{ submission.id }}" class="btn btn-outline-light btn-lg">Back to Request</a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
