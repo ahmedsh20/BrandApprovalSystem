@@ -6,13 +6,13 @@ body {
 
 a,
 button,
-.btn {
+.btn,
+select {
     cursor: pointer;
 }
 
 input,
-textarea,
-select {
+textarea {
     cursor: text;
 }
 
